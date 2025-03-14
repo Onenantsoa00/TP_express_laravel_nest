@@ -1,5 +1,5 @@
 import db from "../config/db_postgres.js";
-import { generateToken } from "../utils.js";
+import { generateToken, generateApiKey } from "../utils.js";
 import bcrypt from "bcrypt";
 const saltRounds = 10;
 
@@ -18,17 +18,20 @@ const register = async (req, res) => {
     // Crypter le mot de passe
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    const apiKey = generateApiKey();
+
     // Enregistrer l'utilisateur avec le mot de passe crypté
     const token = generateToken(data);
     await db.query(
-      `INSERT INTO utilisateurs (name, email, password) VALUES ($1, $2, $3)`,
-      [name, email, hashedPassword]
+      `INSERT INTO utilisateurs (name, email, password, api_key) VALUES ($1, $2, $3, $4)`,
+      [name, email, hashedPassword, apiKey]
     );
 
     res.json({
       success: true,
       message: "Admin created successfully",
       token: token,
+      api_key: apiKey,
       status: 201,
     });
   } catch (error) {
@@ -43,7 +46,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, api_key } = req.body;
 
     // Vérifier que l'email et le mot de passe sont fournis
     if (!email || !password) {
@@ -55,7 +58,7 @@ const login = async (req, res) => {
 
     // Récupérer l'utilisateur par email
     const { rows: results } = await db.query(
-      "SELECT email, password FROM utilisateurs WHERE email = $1",
+      "SELECT email, password, api_key FROM utilisateurs WHERE email = $1",
       [email]
     );
     if (results.length === 0) {
@@ -82,7 +85,8 @@ const login = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Authentication successful",
-      token,
+      token: token,
+      api_Key: admin.api_key,
     });
   } catch (error) {
     console.error(error);
@@ -221,6 +225,33 @@ const delete_utilisateur = async (req, res) => {
     });
   }
 };
+
+const getApiKey = async (req, res) => {
+  try {
+    const email = req.user.email;
+    const { rows } = await db.query(
+      "SELECT api_key FROM utilisateurs WHERE email = $1",
+      [email]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      apiKey: rows[0].api_key,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 export default {
   register,
   login,
@@ -228,4 +259,5 @@ export default {
   show_utilisateur_by_id,
   update_utilisateur,
   delete_utilisateur,
+  getApiKey,
 };

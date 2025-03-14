@@ -71,6 +71,7 @@
  *     tags: [Utilisateur]
  *     security:
  *       - bearerAuth: []
+ *       - apiKeyAuth: []
  *     responses:
  *       200:
  *         description: Liste des utilisateurs
@@ -96,6 +97,7 @@
  *         description: ID de l'utilisateur
  *     security:
  *       - bearerAuth: []
+ *       - apiKeyAuth: []
  *     responses:
  *       200:
  *         description: Détails de l'utilisateur
@@ -138,6 +140,7 @@
  *                 description: Adresse email de l'utilisateur
  *     security:
  *       - bearerAuth: []
+ *       - apiKeyAuth: []
  *     responses:
  *       200:
  *         description: Utilisateur mis à jour avec succès
@@ -165,6 +168,7 @@
  *         description: ID de l'utilisateur
  *     security:
  *       - bearerAuth: []
+ *       - apiKeyAuth: []
  *     responses:
  *       200:
  *         description: Utilisateur supprimé avec succès
@@ -176,9 +180,28 @@
  *         description: Erreur serveur
  */
 
+/**
+ * @swagger
+ * /api/utilisateur/get_api_key:
+ *   get:
+ *     summary: Récupérer l'API-KEY de l'utilisateur
+ *     description: Retourne l'API-KEY de l'utilisateur authentifié.
+ *     tags: [Utilisateur]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: API-KEY récupérée avec succès
+ *       401:
+ *         description: Non autorisé
+ *       500:
+ *         description: Erreur serveur
+ */
+
 import express from "express";
 import authenticationToken from "../authWebToken.js";
 import utilisateurController from "../controller/utilisateurControleur.js";
+import apiKeyMiddleware from "../middleware/apiKeyMiddleware.js";
 
 const router = express.Router();
 
@@ -187,22 +210,31 @@ router.post("/login", utilisateurController.login);
 router.get(
   "/show_utilisateur",
   authenticationToken,
+  apiKeyMiddleware,
   utilisateurController.show_utilisateur
 );
 router.get(
   "/show_utilisateur_by_id/:id",
   authenticationToken,
+  apiKeyMiddleware,
   utilisateurController.show_utilisateur_by_id
 );
 router.put(
   "/update_utilisateur/:id",
   authenticationToken,
+  apiKeyMiddleware,
   utilisateurController.update_utilisateur
 );
 router.delete(
   "/delete_utilisateur/:id",
   authenticationToken,
+  apiKeyMiddleware,
   utilisateurController.delete_utilisateur
+);
+router.get(
+  "/get_api_key",
+  authenticationToken,
+  utilisateurController.getApiKey
 );
 
 export default router;

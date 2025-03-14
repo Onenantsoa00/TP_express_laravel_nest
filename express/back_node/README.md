@@ -24,6 +24,8 @@ Le JWT est géré dans les fichiers suivants :
  src/authWebtokens.js
 src/utils.js
 
+importation de crypto dans utils.js pour le generation de API Key puis on demande ce API KEY dans chaque route à part le register car c'est dans le register qu'on le genére
+
 Lancement du serveur
 Démarrez le serveur avec la commande : npm run dev
 
@@ -47,5 +49,11 @@ Réponse attendue
 "success": true,
 "message": "Admin created successfully",
 "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+"api_key": "fedaa066d7e1497ab89f9bc445440274d40102f4",
 "status": 201
 }
+
+pour les autres requêtes en ajoute dans header le :
+°Authorization:<Bearer your_token>
+°x-api-key: your_API_KEY
+avant d'executer les requếte car sinon il ne donnes aucun retour
