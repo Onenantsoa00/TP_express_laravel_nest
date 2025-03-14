@@ -1,0 +1,22 @@
+On installe le projet AdonisJS avec le commande : npx create-adonis-ts-app back_adonijs
+
+Puis on installe lucid pour le base de données en executant le commande suivant :
+-npm install @adonisjs/lucid@alpha
+-node ace invoke @adonisjs/lucid
+-npm i pg(si postgresql)
+
+configuration du database.ts : host, port, user, password, nom du base de données
+
+configuration du routes.ts
+
+creation du modèle avec sont configuration : node ace make:model Utilisateurs
+
+Après on créer une nouvelle migration avec la commande : node ace make:migration Utilisateurs
+Puis migration de la base de données : node ace migration:run
+
+creation du controller avec configuration : node ace make:controller Utilisateurs
+
+Puis on lance le serveur avec la commande : node ace serve --watch
+
+Enfin on teste les routes avec Postman exemple : http://127.0.0.1:3333/utilisateurs
+pour voir la liste des utilisateurs
